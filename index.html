@@ -1,292 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Editable Letterhead Template with Auto Calculation</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letterhead with Auto Calculation</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --primary-color: #1a73e8;
     --secondary-color: #0056b3;
     --accent-color: #34a853;
-    --light-color: #f8f9fa;
-    --dark-color: #202124;
     --border-color: #dadce0;
-    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --shadow: 0 2px 10px rgba(0,0,0,0.1);
   }
-
-  body { margin:0; padding:0; font-family:'Open Sans',sans-serif; background:#f5f7fa; color:#333; }
-  .container { max-width:1200px; margin:0 auto; padding:20px; }
-  .app-header { text-align:center; margin-bottom:20px; padding:15px; background:white; border-radius:8px; box-shadow:var(--shadow); }
-  .app-header h1 { margin:0; color:var(--primary-color); font-family:'Montserrat',sans-serif; font-weight:600; }
-  .app-header p { margin:5px 0 0; color:#666; }
-  .app-body { display:flex; gap:20px; flex-wrap:wrap; }
-  .settings-panel { flex:1; min-width:300px; background:white; padding:20px; border-radius:8px; box-shadow:var(--shadow); }
-  .settings-panel h2 { margin-top:0; color:var(--primary-color); font-family:'Montserrat',sans-serif; font-weight:500; border-bottom:1px solid var(--border-color); padding-bottom:10px; }
-  .setting-group { margin-bottom:20px; }
-  .setting-group label { display:block; margin-bottom:5px; font-weight:500; color:#555; }
-  .setting-group input, .setting-group select, .setting-group textarea { width:100%; padding:8px 12px; border:1px solid var(--border-color); border-radius:4px; font-family:'Open Sans',sans-serif; box-sizing:border-box; }
-  .setting-group textarea { min-height:80px; resize:vertical; }
-  .theme-options { display:flex; gap:10px; margin-top:10px; }
-  .theme-option { width:30px; height:30px; border-radius:50%; cursor:pointer; border:2px solid transparent; }
-  .theme-option.active { border-color:var(--dark-color); }
-  .letterhead { flex:2; min-width:600px; background:white; padding:20mm; position:relative; border-radius:8px; box-shadow:var(--shadow); min-height:297mm; box-sizing:border-box; }
-  .header { display:flex; justify-content:space-between; align-items:center; padding-bottom:15px; border-bottom:2px solid var(--primary-color); }
-  .logo { width:25mm; height:25mm; object-fit:contain; }
-  .company-details h1 { font-size:28px; margin:0; color:var(--primary-color); font-family:'Montserrat',sans-serif; font-weight:600; }
-  .company-details h2 { font-size:14px; margin:5px 0 0; font-weight:500; color:var(--dark-color); text-transform:uppercase; letter-spacing:1px; }
-  .content-area { margin-top:20mm; font-size:14px; line-height:1.5; min-height:200mm; }
-  .letter-content { min-height:150mm; margin-bottom:20px; padding:10px; border:1px dashed var(--border-color); border-radius:4px; }
-  .letter-content:focus { outline:none; border-color:var(--primary-color); }
-  table { width:100%; border-collapse:collapse; margin:20px 0; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-  th { background-color:var(--primary-color); color:white; padding:10px; text-align:left; font-weight:600; }
-  td { padding:10px; border-bottom:1px solid var(--border-color); }
-  tr:nth-child(even) { background-color:#f8f9fa; }
-  .contact-info { position:absolute; bottom:20mm; width:calc(100% - 40mm); text-align:center; padding-top:10px; border-top:1px solid var(--primary-color); font-size:12px; color:#666; }
-  .watermark { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:120mm; height:120mm; background-size:contain; background-repeat:no-repeat; background-position:center; opacity:0.05; pointer-events:none; z-index:-1; }
-  .controls { margin-top:20px; display:flex; gap:10px; flex-wrap:wrap; }
-  .controls button { padding:8px 16px; border:none; border-radius:4px; background:var(--primary-color); color:white; cursor:pointer; font-family:'Montserrat',sans-serif; font-weight:500; transition:all 0.3s ease; }
-  .controls button:hover { background:var(--secondary-color); transform:translateY(-2px); box-shadow:0 4px 8px rgba(0,0,0,0.1); }
-  .controls button.secondary { background:#6c757d; }
-  .controls button.secondary:hover { background:#5a6268; }
-  .controls button.success { background:var(--accent-color); }
-  .controls button.success:hover { background:#2e8b47; }
-  .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
-  .modal-content { background:white; padding:30px; border-radius:8px; max-width:500px; width:90%; box-shadow:0 5px 15px rgba(0,0,0,0.2); }
-  .modal h3 { margin-top:0; color:var(--primary-color); }
-  .modal-buttons { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
-  @media print { body * { visibility:hidden; } .letterhead, .letterhead * { visibility:visible; } .letterhead { position:absolute; left:0; top:0; width:100%; box-shadow:none; } .settings-panel, .controls, .app-header { display:none; } }
+  body { margin:0; font-family:'Open Sans', sans-serif; background:#f5f7fa; color:#333; }
+  .container { max-width:1200px; margin:20px auto; }
+  .letterhead { background:white; padding:30px; border-radius:8px; box-shadow:var(--shadow); position:relative; }
+  .header { display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--primary-color); padding-bottom:10px; }
+  .logo { width:80px; height:80px; object-fit:contain; }
+  .company-details h1 { margin:0; font-family:'Montserrat',sans-serif; font-weight:600; color:var(--primary-color); font-size:24px; }
+  .company-details h2 { margin:5px 0 0; font-weight:500; font-size:14px; text-transform:uppercase; color:#333; }
+  .content { margin-top:20px; }
+  .letter-content { border:1px dashed var(--border-color); padding:10px; min-height:200px; }
+  table { width:100%; border-collapse:collapse; margin-top:10px; }
+  th, td { padding:10px; border:1px solid var(--border-color); text-align:left; }
+  th { background:var(--primary-color); color:white; }
+  tfoot td { font-weight:bold; }
+  td[contenteditable="true"] { background:#fefefe; }
+  .controls { margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; }
+  .controls button { padding:8px 15px; border:none; border-radius:4px; background:var(--primary-color); color:white; cursor:pointer; }
+  .controls button:hover { background:var(--secondary-color); }
+  .contact-info { margin-top:20px; text-align:center; font-size:12px; border-top:1px solid var(--primary-color); padding-top:5px; color:#666; }
 </style>
 </head>
 <body>
-
 <div class="container">
-  <div class="app-header">
-    <h1>Editable Letterhead Template</h1>
-    <p>Customize your company letterhead and create professional documents</p>
-  </div>
-  
-  <div class="app-body">
-    <div class="settings-panel">
-      <h2>Customization Options</h2>
-      <div class="setting-group">
-        <label for="companyName">Company Name</label>
-        <input type="text" id="companyName" value="MS Enterprise">
+  <div class="letterhead">
+    <div class="header">
+      <img src="https://i.postimg.cc/PrDdmpS8/A-stylized-blue-logo.png" class="logo" id="logo">
+      <div class="company-details">
+        <h1 contenteditable="true" id="companyName">MS Enterprise</h1>
+        <h2 contenteditable="true" id="companyTagline">Industrial Equipment Trading</h2>
       </div>
-      <div class="setting-group">
-        <label for="companyTagline">Company Tagline</label>
-        <input type="text" id="companyTagline" value="INDUSTRIAL EQUIPMENT TRADING">
-      </div>
-      <div class="setting-group">
-        <label for="ownerInfo">Owner Information</label>
-        <input type="text" id="ownerInfo" value="Owner: Moiz - 03172835178">
-      </div>
-      <div class="setting-group">
-        <label for="directorInfo">Director Information</label>
-        <input type="text" id="directorInfo" value="Director: Sameer - 03253785025">
-      </div>
-      <div class="setting-group">
-        <label for="logoUrl">Logo URL</label>
-        <input type="text" id="logoUrl" value="https://i.postimg.cc/PrDdmpS8/A-stylized-blue-logo.png">
-      </div>
-      <div class="setting-group">
-        <label for="watermarkUrl">Watermark URL</label>
-        <input type="text" id="watermarkUrl" value="https://i.postimg.cc/PrDdmpS8/A-stylized-blue-logo.png">
-      </div>
-      <div class="setting-group">
-        <label for="letterContent">Default Letter Content</label>
-        <textarea id="letterContent">Dear [Recipient Name],
+    </div>
 
-We are pleased to provide you with the following quotation for your consideration.
+    <div class="content">
+      <div class="letter-content" contenteditable="true" id="letterContent">
+        Dear [Recipient Name],<br><br>
+        We are pleased to provide you with the following quotation for your consideration.
+      </div>
 
-Thank you for your business.
+      <table id="itemTable">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Description</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td contenteditable="true" class="item-name"></td>
+            <td contenteditable="true" class="item-desc"></td>
+            <td contenteditable="true" class="item-qty"></td>
+            <td contenteditable="true" class="item-rate"></td>
+            <td class="item-amount">0.00</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4" style="text-align:right">Total</td>
+            <td id="totalAmount">0.00</td>
+          </tr>
+        </tfoot>
+      </table>
 
-Sincerely,
-[Your Name]
-MS Enterprise</textarea>
-      </div>
-      <div class="setting-group">
-        <label>Color Theme</label>
-        <div class="theme-options">
-          <div class="theme-option active" style="background-color: #1a73e8;" data-theme="blue"></div>
-          <div class="theme-option" style="background-color: #34a853;" data-theme="green"></div>
-          <div class="theme-option" style="background-color: #ea4335;" data-theme="red"></div>
-          <div class="theme-option" style="background-color: #fbbc05;" data-theme="yellow"></div>
-          <div class="theme-option" style="background-color: #673ab7;" data-theme="purple"></div>
-        </div>
-      </div>
-      <div class="setting-group">
-        <label for="fontFamily">Font Family</label>
-        <select id="fontFamily">
-          <option value="'Open Sans', sans-serif">Open Sans</option>
-          <option value="'Montserrat', sans-serif">Montserrat</option>
-          <option value="Arial, sans-serif">Arial</option>
-          <option value="'Times New Roman', serif">Times New Roman</option>
-        </select>
-      </div>
       <div class="controls">
-        <button id="applySettingsBtn">Apply Changes</button>
-        <button id="resetSettingsBtn" class="secondary">Reset to Default</button>
-      </div>
-    </div>
-    
-    <div class="letterhead">
-      <div class="watermark" id="watermark"></div>
-      <div class="header">
-        <img src="https://i.postimg.cc/PrDdmpS8/A-stylized-blue-logo.png" class="logo" alt="Logo" id="logoImg" />
-        <div class="company-details">
-          <h1 id="companyNameDisplay">MS Enterprise</h1>
-          <h2 id="companyTaglineDisplay">INDUSTRIAL EQUIPMENT TRADING</h2>
-        </div>
+        <button id="addRow">Add Row</button>
+        <button id="clearTable">Clear Table</button>
+        <button id="insertDate">Insert Date</button>
+        <button id="downloadPDF">Download PDF</button>
+        <button id="print">Print</button>
       </div>
 
-      <div class="content-area">
-        <div class="letter-content" contenteditable="true" id="editableContent">
-          Dear [Recipient Name],<br><br>
-          We are pleased to provide you with the following quotation for your consideration.<br><br>
-          <table id="itemTable">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Description</th>
-                <th>Qty</th>
-                <th>Rate</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td contenteditable="true" class="item-name"></td>
-                <td contenteditable="true" class="item-desc"></td>
-                <td contenteditable="true" class="item-qty"></td>
-                <td contenteditable="true" class="item-rate"></td>
-                <td contenteditable="true" class="item-amount"></td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="4" style="text-align:right; font-weight:bold;">Total:</td>
-                <td id="totalAmount">0.00</td>
-              </tr>
-            </tfoot>
-          </table>
-          <br>
-          Thank you for your business.<br><br>
-          Sincerely,<br>
-          [Your Name]<br>
-          MS Enterprise
-        </div>
-        <div class="controls">
-          <button id="addRowBtn">Add Row</button>
-          <button id="clearTableBtn" class="secondary">Clear Table</button>
-          <button id="insertDateBtn">Insert Date</button>
-          <button id="downloadPdfBtn" class="success">Download PDF</button>
-          <button id="printBtn">Print</button>
-          <button id="saveTemplateBtn">Save Template</button>
-        </div>
+      <div class="contact-info" contenteditable="true" id="contactInfo">
+        Owner: Moiz - 03172835178 | Director: Sameer - 03253785025
       </div>
-
-      <div class="contact-info">
-        <p id="contactInfoDisplay">Owner: Moiz - 03172835178 | Director: Sameer - 03253785025</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal for Save Template -->
-<div class="modal" id="saveModal">
-  <div class="modal-content">
-    <h3>Save Template</h3>
-    <p>Your template has been saved successfully. You can reload this page anytime to restore your settings.</p>
-    <div class="modal-buttons">
-      <button id="closeModalBtn">Close</button>
     </div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const companyNameInput = document.getElementById('companyName');
-  const companyTaglineInput = document.getElementById('companyTagline');
-  const ownerInfoInput = document.getElementById('ownerInfo');
-  const directorInfoInput = document.getElementById('directorInfo');
-  const logoUrlInput = document.getElementById('logoUrl');
-  const watermarkUrlInput = document.getElementById('watermarkUrl');
-  const letterContentInput = document.getElementById('letterContent');
-  const fontFamilySelect = document.getElementById('fontFamily');
-  const themeOptions = document.querySelectorAll('.theme-option');
+  const tableBody = document.querySelector('#itemTable tbody');
+  const totalCell = document.getElementById('totalAmount');
 
-  const companyNameDisplay = document.getElementById('companyNameDisplay');
-  const companyTaglineDisplay = document.getElementById('companyTaglineDisplay');
-  const contactInfoDisplay = document.getElementById('contactInfoDisplay');
-  const logoImg = document.getElementById('logoImg');
-  const watermark = document.getElementById('watermark');
-  const editableContent = document.getElementById('editableContent');
-  const addRowBtn = document.getElementById('addRowBtn');
-  const clearTableBtn = document.getElementById('clearTableBtn');
-  const insertDateBtn = document.getElementById('insertDateBtn');
-  const downloadPdfBtn = document.getElementById('downloadPdfBtn');
-  const printBtn = document.getElementById('printBtn');
-  const saveTemplateBtn = document.getElementById('saveTemplateBtn');
-  const saveModal = document.getElementById('saveModal');
-  const closeModalBtn = document.getElementById('closeModalBtn');
-  const applySettingsBtn = document.getElementById('applySettingsBtn');
-  const resetSettingsBtn = document.getElementById('resetSettingsBtn');
-
-  const tableBody = document.getElementById('itemTable').getElementsByTagName('tbody')[0];
-  const totalAmountCell = document.getElementById('totalAmount');
-
-  // Load saved settings
-  loadSettings();
-
-  // Event listeners
-  applySettingsBtn.addEventListener('click', applySettings);
-  resetSettingsBtn.addEventListener('click', resetSettings);
-  addRowBtn.addEventListener('click', addRow);
-  clearTableBtn.addEventListener('click', clearTable);
-  insertDateBtn.addEventListener('click', insertDate);
-  downloadPdfBtn.addEventListener('click', generatePDF);
-  printBtn.addEventListener('click', () => window.print());
-  saveTemplateBtn.addEventListener('click', saveTemplate);
-  closeModalBtn.addEventListener('click', () => saveModal.style.display = 'none');
-
-  themeOptions.forEach(option => {
-    option.addEventListener('click', function() {
-      themeOptions.forEach(opt => opt.classList.remove('active'));
-      this.classList.add('active');
-      applyTheme(this.dataset.theme);
+  function recalcAmounts() {
+    let total = 0;
+    tableBody.querySelectorAll('tr').forEach(row => {
+      const qty = parseFloat(row.querySelector('.item-qty').textContent) || 0;
+      const rate = parseFloat(row.querySelector('.item-rate').textContent) || 0;
+      const amount = qty * rate;
+      row.querySelector('.item-amount').textContent = amount.toFixed(2);
+      total += amount;
     });
+    totalCell.textContent = total.toFixed(2);
+  }
+
+  tableBody.addEventListener('input', recalcAmounts);
+
+  document.getElementById('addRow').addEventListener('click', () => {
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+      <td contenteditable="true" class="item-name"></td>
+      <td contenteditable="true" class="item-desc"></td>
+      <td contenteditable="true" class="item-qty"></td>
+      <td contenteditable="true" class="item-rate"></td>
+      <td class="item-amount">0.00</td>
+    `;
+    tableBody.appendChild(newRow);
   });
 
-  tableBody.addEventListener('input', updateAmounts);
+  document.getElementById('clearTable').addEventListener('click', () => {
+    tableBody.innerHTML = `<tr>
+      <td contenteditable="true" class="item-name"></td>
+      <td contenteditable="true" class="item-desc"></td>
+      <td contenteditable="true" class="item-qty"></td>
+      <td contenteditable="true" class="item-rate"></td>
+      <td class="item-amount">0.00</td>
+    </tr>`;
+    recalcAmounts();
+  });
 
-  function applySettings() {
-    companyNameDisplay.textContent = companyNameInput.value;
-    companyTaglineDisplay.textContent = companyTaglineInput.value;
-    contactInfoDisplay.textContent = `${ownerInfoInput.value} | ${directorInfoInput.value}`;
-    logoImg.src = logoUrlInput.value;
-    watermark.style.backgroundImage = `url('${watermarkUrlInput.value}')`;
-    document.querySelector('.letterhead').style.fontFamily = fontFamilySelect.value;
-    saveSettings();
-  }
+  document.getElementById('insertDate').addEventListener('click', () => {
+    const date = new Date().toLocaleDateString();
+    const p = document.createElement('p');
+    p.textContent = 'Date: ' + date;
+    document.getElementById('letterContent').appendChild(p);
+  });
 
-  function resetSettings() {
-    companyNameInput.value = "MS Enterprise";
-    companyTaglineInput.value = "INDUSTRIAL EQUIPMENT TRADING";
-    ownerInfoInput.value = "Owner: Moiz - 03172835178";
-    directorInfoInput.value = "Director: Sameer - 03253785025";
-    logoUrlInput.value = "https://i.postimg.cc/PrDdmpS8/A-stylized-blue-logo.png";
-    watermarkUrlInput.value = "https://i.postimg.cc/PrDdmpS8/A-stylized-blue-logo.png";
-    letterContentInput.value = `Dear [Recipient Name],\n\nWe are pleased to provide you with the following quotation for your consideration.\n\nThank you for your business.\n\nSincerely,\n[Your Name]\nMS Enterprise`;
-    fontFamilySelect.value = "'Open Sans', sans-serif";
-    themeOptions.forEach(opt => opt.classList.remove('active'));
-    document.querySelector('.theme-option[data-theme="blue"]').classList.add('active');
-    applyTheme('blue');
-    applySettings();
-  }
+  document.getElementById('downloadPDF').addEventListener('click', () => {
+    const element = document.querySelector('.letterhead');
+    html2pdf().from(element).set({margin:10, filename:'Letter.pdf', jsPDF:{unit:'mm', format:'a4'}}).save();
+  });
 
-  function apply
+  document.getElementById('print').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>
