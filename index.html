@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Letterhead with Auto Calculation</title>
+<title>Letterhead with Auto Calculation and Recipient Name</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -27,14 +27,38 @@
   th { background:var(--primary-color); color:white; }
   tfoot td { font-weight:bold; }
   td[contenteditable="true"] { background:#fefefe; }
-  .controls { margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; }
-  .controls button { padding:8px 15px; border:none; border-radius:4px; background:var(--primary-color); color:white; cursor:pointer; }
-  .controls button:hover { background:var(--secondary-color); }
+  .controls, .settings-panel { margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; }
+  .controls button, .settings-panel button { padding:8px 15px; border:none; border-radius:4px; background:var(--primary-color); color:white; cursor:pointer; }
+  .controls button:hover, .settings-panel button:hover { background:var(--secondary-color); }
+  .settings-panel { flex-direction:column; }
+  .settings-panel label { font-weight:500; margin-top:5px; }
   .contact-info { margin-top:20px; text-align:center; font-size:12px; border-top:1px solid var(--primary-color); padding-top:5px; color:#666; }
 </style>
 </head>
 <body>
 <div class="container">
+
+  <!-- Settings Panel -->
+  <div class="settings-panel">
+    <label for="recipientName">Recipient Name</label>
+    <input type="text" id="recipientName" placeholder="Enter recipient name">
+
+    <label for="companyNameInput">Company Name</label>
+    <input type="text" id="companyNameInput" value="MS Enterprise">
+
+    <label for="companyTaglineInput">Company Tagline</label>
+    <input type="text" id="companyTaglineInput" value="Industrial Equipment Trading">
+
+    <label for="contactInfoInput">Contact Info</label>
+    <input type="text" id="contactInfoInput" value="Owner: Moiz - 03172835178 | Director: Sameer - 03253785025">
+
+    <label for="logoInput">Logo URL</label>
+    <input type="text" id="logoInput" value="https://i.postimg.cc/PrDdmpS8/A-stylized-blue-logo.png">
+
+    <button id="applySettings">Apply Changes</button>
+  </div>
+
+  <!-- Letterhead -->
   <div class="letterhead">
     <div class="header">
       <img src="https://i.postimg.cc/PrDdmpS8/A-stylized-blue-logo.png" class="logo" id="logo">
@@ -46,8 +70,8 @@
 
     <div class="content">
       <div class="letter-content" contenteditable="true" id="letterContent">
-        Dear [Recipient Name],<br><br>
-        We are pleased to provide you with the following quotation for your consideration.
+        <p>Dear <span id="recipientPlaceholder">[Recipient Name]</span>,</p>
+        <p>We are pleased to provide you with the following quotation for your consideration.</p>
       </div>
 
       <table id="itemTable">
@@ -90,10 +114,28 @@
       </div>
     </div>
   </div>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
 <script>
+  // Recipient Name Update
+  const recipientInput = document.getElementById('recipientName');
+  const recipientPlaceholder = document.getElementById('recipientPlaceholder');
+  recipientInput.addEventListener('input', () => {
+    recipientPlaceholder.textContent = recipientInput.value.trim() || '[Recipient Name]';
+  });
+
+  // Company info update
+  const applyBtn = document.getElementById('applySettings');
+  applyBtn.addEventListener('click', () => {
+    document.getElementById('companyName').textContent = document.getElementById('companyNameInput').value;
+    document.getElementById('companyTagline').textContent = document.getElementById('companyTaglineInput').value;
+    document.getElementById('contactInfo').textContent = document.getElementById('contactInfoInput').value;
+    document.getElementById('logo').src = document.getElementById('logoInput').value;
+  });
+
+  // Table auto-calculation
   const tableBody = document.querySelector('#itemTable tbody');
   const totalCell = document.getElementById('totalAmount');
 
@@ -111,6 +153,7 @@
 
   tableBody.addEventListener('input', recalcAmounts);
 
+  // Add/Clear Rows
   document.getElementById('addRow').addEventListener('click', () => {
     const newRow = document.createElement('tr');
     newRow.innerHTML = `
@@ -134,6 +177,7 @@
     recalcAmounts();
   });
 
+  // Insert Date
   document.getElementById('insertDate').addEventListener('click', () => {
     const date = new Date().toLocaleDateString();
     const p = document.createElement('p');
@@ -141,11 +185,10 @@
     document.getElementById('letterContent').appendChild(p);
   });
 
+  // PDF & Print
   document.getElementById('downloadPDF').addEventListener('click', () => {
-    const element = document.querySelector('.letterhead');
-    html2pdf().from(element).set({margin:10, filename:'Letter.pdf', jsPDF:{unit:'mm', format:'a4'}}).save();
+    html2pdf().from(document.querySelector('.letterhead')).set({margin:10, filename:'Letter.pdf', jsPDF:{unit:'mm', format:'a4'}}).save();
   });
-
   document.getElementById('print').addEventListener('click', () => window.print());
 </script>
 </body>
